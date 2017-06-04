@@ -1,0 +1,33 @@
+package br.com.db1.task;
+
+import br.com.db1.model.Money;
+import br.com.db1.model.Rate;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.List;
+import java.util.concurrent.Callable;
+
+public class ExecutorTaskMoney implements Callable<Money> {
+
+    private Rate rate;
+
+    public ExecutorTaskMoney(Rate rate) {
+        this.rate = rate;
+    }
+
+    @Override
+    public Money call() throws Exception {
+        Money money = new Money();
+        money.setRate(rate);
+        money.setValue(generateRandomBigDecimalFromRange());
+        return money;
+    }
+
+    public static BigDecimal generateRandomBigDecimalFromRange() {
+        BigDecimal min = new BigDecimal(100.0);
+        BigDecimal max = new BigDecimal(2000.0);
+        BigDecimal randomBigDecimal = min.add(new BigDecimal(Math.random()).multiply(max.subtract(min)));
+        return randomBigDecimal.setScale(2,BigDecimal.ROUND_HALF_UP);
+    }
+}
