@@ -7,20 +7,19 @@ public class Money {
     private BigDecimal value;
     private Rate rate;
 
+    protected Money() {
+    }
+    public Money(BigDecimal value, Rate rate) {
+        this.value = value;
+        this.rate = rate;
+    }
+
     public BigDecimal getValue() {
         return value;
     }
 
-    public void setValue(BigDecimal value) {
-        this.value = value;
-    }
-
     public Rate getRate() {
         return rate;
-    }
-
-    public void setRate(Rate rate) {
-        this.rate = rate;
     }
 
     @Override

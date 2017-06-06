@@ -4,8 +4,6 @@ import br.com.db1.model.Money;
 import br.com.db1.model.Rate;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.List;
 import java.util.concurrent.Callable;
 
 public class ExecutorTaskMoney implements Callable<Money> {
@@ -18,10 +16,7 @@ public class ExecutorTaskMoney implements Callable<Money> {
 
     @Override
     public Money call() throws Exception {
-        Money money = new Money();
-        money.setRate(rate);
-        money.setValue(generateRandomBigDecimalFromRange());
-        return money;
+        return new Money(generateRandomBigDecimalFromRange(), rate);
     }
 
     public static BigDecimal generateRandomBigDecimalFromRange() {
