@@ -6,11 +6,11 @@ import br.com.db1.model.Rate;
 import java.math.BigDecimal;
 import java.util.concurrent.Callable;
 
-public class ExecutorTaskMoney implements Callable<Money> {
+public class TaskMoneyCallable implements Callable<Money> {
 
     private Rate rate;
 
-    public ExecutorTaskMoney(Rate rate) {
+    public TaskMoneyCallable(Rate rate) {
         this.rate = rate;
     }
 

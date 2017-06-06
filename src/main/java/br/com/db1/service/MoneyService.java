@@ -3,7 +3,7 @@ package br.com.db1.service;
 import br.com.db1.infrastructure.TaskExecutorPool;
 import br.com.db1.model.Money;
 import br.com.db1.model.Rate;
-import br.com.db1.task.ExecutorTaskMoney;
+import br.com.db1.task.TaskMoneyCallable;
 import com.google.common.collect.Lists;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
@@ -32,7 +32,7 @@ public class MoneyService {
     }
 
     private void executeFuture(CompletionService executor, List<Future<Money>> result, Rate rate) {
-        Future thread = executor.submit(new ExecutorTaskMoney(rate));
+        Future thread = executor.submit(new TaskMoneyCallable(rate));
         result.add(thread);
     }
 
