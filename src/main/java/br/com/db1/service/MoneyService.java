@@ -19,14 +19,15 @@ public class MoneyService {
 
     private static Logger LOGGER = Logger.getLogger(MoneyService.class);
 
-    public List<Money> getListOfMoney(List<Rate> rates) {
+    public List<Money> getListOfMoney(List<Rate> rateListOne, List<Rate> rateListTwo) {
         CompletionService executor = TaskExecutorPool.createCompletionService();
-        List<Future<Money>> result = Lists.newLinkedList();
+        List<Future<Money>> moeyListOne = Lists.newLinkedList();
 
-        rates.forEach(rate -> executeFuture(executor, result, rate));
+        rateListOne.forEach(rate -> executeFuture(executor, moeyListOne, rate));
+        rateListTwo.forEach(rate -> executeFuture(executor, moeyListOne, rate));
 
         List<Money> moneyList = new ArrayList<>();
-        result.forEach(r -> mountListOfMoney(r, moneyList));
+        moeyListOne.forEach(r -> mountListOfMoney(r, moneyList));
         return moneyList;
 
     }
@@ -38,9 +39,16 @@ public class MoneyService {
 
     private void mountListOfMoney(Future<Money> r, List<Money> moneyList) {
         try {
+            waitFinishProcess(r);
             moneyList.add(r.get());
         } catch (InterruptedException | ExecutionException e) {
             LOGGER.info(e.getMessage(), e);
+        }
+    }
+
+    private void waitFinishProcess(Future<Money> r) throws InterruptedException {
+        while(!r.isDone()) {
+            System.out.println("waiting convert rates...");
         }
     }
 }
