@@ -26,11 +26,11 @@ public class ApplicationController {
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<?> classifier() {
         try {
-            List<Rate> rates = rateService.obterRates();
+            List<Rate> rates = rateService.getRates();
             List<Money> listOfMoney = moneyService.getListOfMoney(rates, rates);
-            return new ResponseEntity(listOfMoney, HttpStatus.OK);
+            return new ResponseEntity<>(listOfMoney, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
     }

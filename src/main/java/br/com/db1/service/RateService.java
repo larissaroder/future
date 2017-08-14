@@ -13,7 +13,7 @@ import java.util.List;
 public class RateService {
 
     private static final String URL = "https://bitpay.com/api/rates";
-    public List<Rate> obterRates() {
+    public List<Rate> getRates() {
 
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<List<Rate>> rateResponse =
