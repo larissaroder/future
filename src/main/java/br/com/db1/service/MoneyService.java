@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
@@ -21,7 +22,7 @@ public class MoneyService {
 
     public List<Money> getListOfMoney(List<Rate> rateListOne, List<Rate> rateListTwo) {
         CompletionService executor = TaskExecutorPool.createCompletionService();
-        List<Future<Money>> moeyListOne = Lists.newLinkedList();
+        List<Future<Money>> moeyListOne = Collections.synchronizedList(Lists.newLinkedList());
 
         rateListOne.forEach(rate -> executeFuture(executor, moeyListOne, rate));
         rateListTwo.forEach(rate -> executeFuture(executor, moeyListOne, rate));
@@ -37,18 +38,13 @@ public class MoneyService {
         result.add(thread);
     }
 
-    private void mountListOfMoney(Future<Money> r, List<Money> moneyList) {
+    private synchronized void mountListOfMoney(Future<Money> r, List<Money> moneyList) {
         try {
-            waitFinishProcess(r);
-            moneyList.add(r.get());
+            synchronized (moneyList) {
+                moneyList.add(r.get());
+            }
         } catch (InterruptedException | ExecutionException e) {
             LOGGER.info(e.getMessage(), e);
-        }
-    }
-
-    private void waitFinishProcess(Future<Money> r) throws InterruptedException {
-        while(!r.isDone()) {
-            System.out.println("waiting convert rates...");
         }
     }
 }

@@ -5,18 +5,22 @@ import br.com.db1.model.Rate;
 
 import java.math.BigDecimal;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicReference;
 
-public class TaskMoneyCallable implements Callable<Money> {
+public class TaskMoneyCallable implements Callable<AtomicReference<Money>> {
 
     private Rate rate;
+
+    private AtomicReference<Money> money = new AtomicReference<>();
 
     public TaskMoneyCallable(Rate rate) {
         this.rate = rate;
     }
 
     @Override
-    public Money call() throws Exception {
-        return new Money(generateRandomBigDecimalFromRange(), rate);
+    public AtomicReference<Money> call() throws Exception {
+        money.set(new Money(generateRandomBigDecimalFromRange(), rate));
+        return money;
     }
 
     public static BigDecimal generateRandomBigDecimalFromRange() {

@@ -5,13 +5,15 @@ public class Rate {
     private String code;
     private Double rate;
 
-    protected Rate () { }
+    protected Rate() {
+    }
 
     public Rate(String name, String code, Double rate) {
         this.name = name;
         this.code = code;
         this.rate = rate;
     }
+
     public String getName() {
         return name;
     }

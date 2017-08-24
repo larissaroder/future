@@ -1,6 +1,7 @@
 package br.com.db1.model;
 
 import java.math.BigDecimal;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Money {
 
