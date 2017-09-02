@@ -6,36 +6,70 @@ import br.com.db1.model.Rate;
 import br.com.db1.task.TaskMoneyCallable;
 import com.google.common.collect.Lists;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class MoneyService {
 
+    @Autowired
+    private RateService rateService;
+
     private static Logger LOGGER = Logger.getLogger(MoneyService.class);
 
-    public List<Money> getListOfMoney(List<Rate> rateListOne, List<Rate> rateListTwo) {
-        CompletionService executor = TaskExecutorPool.createCompletionService();
-        List<Future<Money>> moeyListOne = Collections.synchronizedList(Lists.newLinkedList());
+    private AtomicReference<Money> moneyAtomic = new AtomicReference<>();
 
-        rateListOne.forEach(rate -> executeFuture(executor, moeyListOne, rate));
-        rateListTwo.forEach(rate -> executeFuture(executor, moeyListOne, rate));
+    private List<Future<Money>> moeyList = Collections.synchronizedList(Lists.newLinkedList());
+
+    /**
+     * obtem uma lista de dinheiro com valores aleatórios e vai somando os valores entre eles sincronizados
+     * endpoint que cria uma lista de dinheiro com moedas próprias
+     * o valor do dinheiro
+     * @return
+     */
+    public List<Money> useAtomicReference() {
+        CompletionService executor = TaskExecutorPool.createCompletionService();
+
+        Rate rate = new Rate("AtomicTest", "AT", 0.0);
+        List<Money> listOfMoney = getListOfMoney();
+
+
+        moneyAtomic.set(new Money(new BigDecimal(0.0), rate));
+        listOfMoney.forEach(money -> executeFuture(executor, money, rate, moneyAtomic));
 
         List<Money> moneyList = new ArrayList<>();
-        moeyListOne.forEach(r -> mountListOfMoney(r, moneyList));
+        moeyList.forEach(r -> mountListOfMoney(r, moneyList));
         return moneyList;
 
     }
 
-    private void executeFuture(CompletionService executor, List<Future<Money>> result, Rate rate) {
-        Future thread = executor.submit(new TaskMoneyCallable(rate));
-        result.add(thread);
+    /**
+     * endpoint para ser usado no exercício de map reduce
+     * @return
+     */
+    public List<Money> getListOfMoney() {
+        List<Money> moneyList = Lists.newLinkedList();
+        rateService.getRates().forEach(rate -> {
+            BigDecimal min = new BigDecimal(100.0);
+            BigDecimal max = new BigDecimal(2000.0);
+            BigDecimal randomBigDecimal = min.add(new BigDecimal(Math.random()).multiply(max.subtract(min)));
+            moneyList.add(new Money(randomBigDecimal.setScale(2, BigDecimal.ROUND_HALF_UP), rate));
+        });
+        return moneyList;
+    }
+
+    private void executeFuture(CompletionService executor, Money money, Rate rate, AtomicReference<Money> moneyAtomic) {
+        Future thread = executor.submit(new TaskMoneyCallable(money, rate, moneyAtomic));
+        moeyList.add(thread);
     }
 
     private synchronized void mountListOfMoney(Future<Money> r, List<Money> moneyList) {

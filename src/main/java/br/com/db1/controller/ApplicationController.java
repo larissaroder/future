@@ -1,7 +1,6 @@
 package br.com.db1.controller;
 
 import br.com.db1.model.Money;
-import br.com.db1.model.Rate;
 import br.com.db1.service.MoneyService;
 import br.com.db1.service.RateService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +25,18 @@ public class ApplicationController {
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<?> classifier() {
         try {
-            List<Rate> rates = rateService.getRates();
-            List<Money> listOfMoney = moneyService.getListOfMoney(rates, rates);
+            List<Money> listOfMoney = moneyService.getListOfMoney();
+            return new ResponseEntity<>(listOfMoney, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+
+    }
+
+    @RequestMapping(value = "/atomic", method = RequestMethod.GET)
+    public ResponseEntity<?> atomic() {
+        try {
+            List<Money> listOfMoney = moneyService.useAtomicReference();
             return new ResponseEntity<>(listOfMoney, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
